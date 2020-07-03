@@ -1,6 +1,6 @@
 use actix::prelude::*;
 use actix_files as fs;
-use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer, Responder, http};
+use actix_web::{http, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use anyhow::Context;
 use find_cmdlet_index::pascal_splitter;
 use serde::{Deserialize, Serialize};
@@ -17,6 +17,8 @@ include!(concat!(env!("OUT_DIR"), "/templates.rs"));
 struct SearchQuery {
     #[serde(rename = "q")]
     query: String,
+    #[serde(rename = "t")]
+    ty: String,
 }
 
 #[derive(Serialize)]
@@ -186,7 +188,11 @@ fn search_index(index: &tantivy::Index, query_str: &str) -> anyhow::Result<Vec<C
                 module_version: module_version.trim().to_string(),
                 name: name.trim().to_string(),
                 url: url.to_string(),
-                tags: tags.split(' ').filter(|t| !t.trim().is_empty()).map(|s| s.trim().to_string()).collect(),
+                tags: tags
+                    .split(' ')
+                    .filter(|t| !t.trim().is_empty())
+                    .map(|s| s.trim().to_string())
+                    .collect(),
                 synopsis: synopsis.trim().to_string(),
                 syntax: syntax.trim().to_string(),
                 score,
@@ -219,23 +225,22 @@ async fn search(
     //    .map_err(ise)?;
 
     let mut response = HttpResponse::Ok();
-    let accept_header = request.headers().get("Accept").map(|v| v.to_str());
 
-    match accept_header {
-        Some(Ok(header)) if header == "application/json" => Ok(response.json(results)),
-        _ => {
-            let meta = "<meta name=\"robots\" content=\"noindex\">";
-            let resp = render_page(
-                &state.config.web_root,
-                "search",
-                meta,
-                &query.query,
-                &results,
-            )
-            .map_err(ise)?;
-            response.set_header(http::header::CONTENT_TYPE, "text/html");
-            Ok(response.body(resp))
-        }
+    if query.ty == "json" {
+        Ok(response.json(results))
+    } else {
+        let meta = "<meta name=\"robots\" content=\"noindex\">";
+        let resp = render_page(
+            &state.config.web_root,
+            "search",
+            meta,
+            &query.query,
+            &results,
+        )
+        .map_err(ise)?;
+        response.set_header(http::header::CONTENT_TYPE, "text/html");
+
+        Ok(response.body(resp))
     }
 }
 
@@ -268,16 +273,14 @@ fn render_page(
 ) -> anyhow::Result<Vec<u8>> {
     let web_root = web_root.as_ref();
     let style_path = web_root.join("static/style.css");
-    let js_path = web_root.join("static/index.min.js");
     let mut resp = Vec::new();
     let style_integrity =
         integrity(style_path).context("could not calculate integrity for stylesheet")?;
-    let script_integrity =
-        integrity(js_path).context("could not calculate integrity for javascript")?;
+    //let script_integrity =
+    //    integrity(js_path).context("could not calculate integrity for javascript")?;
     templates::index_html(
         &mut resp,
         &style_integrity,
-        &script_integrity,
         body_classes,
         extra_head,
         query_str,
@@ -294,13 +297,17 @@ async fn index(
 ) -> actix_web::Result<impl Responder> {
     let resp = render_page(&state.config.web_root, "", "", "", &[]).map_err(ise)?;
 
-    Ok(HttpResponse::Ok().set_header(http::header::CONTENT_TYPE, "text/html").body(resp))
+    Ok(HttpResponse::Ok()
+        .set_header(http::header::CONTENT_TYPE, "text/html")
+        .body(resp))
 }
 
 async fn robots() -> actix_web::Result<impl Responder> {
     let robots = "User-Agent: *
 Disallow: /search";
-    Ok(HttpResponse::Ok().set_header(http::header::CONTENT_TYPE, "text/plain").body(robots))
+    Ok(HttpResponse::Ok()
+        .set_header(http::header::CONTENT_TYPE, "text/plain")
+        .body(robots))
 }
 
 struct State {
@@ -346,7 +353,10 @@ fn error_handler(
 Something went wrong...";
     Ok(middleware::errhandlers::ErrorHandlerResponse::Response(
         response.map_body(|head, _body| {
-            head.headers_mut().append(http::header::CONTENT_TYPE, http::HeaderValue::from_static("text/plain"));
+            head.headers_mut().append(
+                http::header::CONTENT_TYPE,
+                http::HeaderValue::from_static("text/plain"),
+            );
             actix_web::dev::ResponseBody::Body(oh_no.into())
         }),
     ))
@@ -391,16 +401,15 @@ fn run_server(config: &Config) -> anyhow::Result<()> {
                 //index: index_addr.clone(),
                 config: server_config.clone(),
             })
-            .wrap(middleware::errhandlers::ErrorHandlers::new().handler(
-                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-                error_handler,
-            ).handler(
-                actix_web::http::StatusCode::NOT_FOUND,
-                error_handler,
-            ).handler(
-                actix_web::http::StatusCode::FORBIDDEN,
-                error_handler,
-            ))
+            .wrap(
+                middleware::errhandlers::ErrorHandlers::new()
+                    .handler(
+                        actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+                        error_handler,
+                    )
+                    .handler(actix_web::http::StatusCode::NOT_FOUND, error_handler)
+                    .handler(actix_web::http::StatusCode::FORBIDDEN, error_handler),
+            )
             .wrap(prom)
             .wrap(middleware::Compress::default())
             .wrap(default_headers)

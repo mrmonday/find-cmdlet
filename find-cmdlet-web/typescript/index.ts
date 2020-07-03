@@ -60,13 +60,9 @@ function main() {
         if (!query) {
             return;
         }
-        const url = '/search?q=' + encodeURIComponent(query);
+        const url = '/search?t=json&q=' + encodeURIComponent(query);
         try {
-            let response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/json'
-                },
-            });
+            let response = await fetch(url);
             if (!response.ok) {
                 throw '';
             }

@@ -2,7 +2,6 @@
 @use rand::Rng;
 
 @(style_integrity: &str,
-  script_integrity: &str,
   body_classes: &str,
   extra_head: &str,
   query_str: &str,
@@ -15,7 +14,6 @@
     <meta name="viewport" content="width=device-width">
     <title>Find-Cmdlet</title>
     <link rel="stylesheet" href="/static/style.css" integrity="@style_integrity">
-    <script type="module" src="/static/index.min.js" integrity="@script_integrity"></script>
     <link rel="search" type="application/opensearchdescription+xml" title="Find-Cmdlet" href="/static/opensearch.xml">
     <link rel="icon" href="/assets/favicon.ico" sizes="16x16">
     <link rel="icon" href="/assets/favicon64.png" sizes="64x64">
