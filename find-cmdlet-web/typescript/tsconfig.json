@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "sourceMap": true,
+        "target": "es2017"
+    },
+    "files": [
+        "index.ts"
+    ]
+}

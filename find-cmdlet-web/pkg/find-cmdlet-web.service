@@ -1,0 +1,47 @@
+[Unit]
+Description=find-cmdlet-web
+RefuseManualStart=true
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/find-cmdlet-web -c /etc/find-cmdlet-web/Config.toml
+User=find-cmdlet-web
+Group=find-cmdlet-web
+
+# It would be nice to enable these, it caused a 4x performance hit when I tried though...
+# Worth retrying in future
+
+#PrivateTmp=yes
+#PrivateMounts=yes
+#PrivateDevices=yes
+#PrivateUsers=yes
+#PrivateNetwork=yes
+#
+#ProtectSystem=strict
+#ProtectHome=yes
+#ProtectKernelTunables=yes
+#ProtectKernelModules=yes
+#ProtectControlGroups=yes
+#
+#MemoryDenyWriteExecute=yes
+#RestrictRealtime=yes
+## this makes systemd-analyze security happy, but gives a warning
+## at runtime... just disable the socket syscall later instead
+##RestrictAddressFamilies=yes
+#RestrictNamespaces=yes
+#
+#ReadOnlyPaths=/etc/find-cmdlet-web /var/lib/find-cmdlet-web
+#ReadWritePaths=/var/lib/find-cmdlet-web/index/.tantivy-meta.lock
+#
+#NoNewPrivileges=yes
+#CapabilityBoundingSet=
+#SystemCallArchitectures=native
+#SystemCallFilter=@system-service
+#SystemCallFilter=~@resources @privileged socket
+#SystemCallErrorNumber=EPERM
+#LockPersonality=yes
+#
+#RemoveIPC=yes
+#UMask=0077
+#
+#LimitNOFILE=4096

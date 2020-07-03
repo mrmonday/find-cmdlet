@@ -1,0 +1,9 @@
+target
+find-cmdlet-web/target
+.vscode
+*.min.js
+*.css
+*.map
+**/.sass-cache
+**/.vscode
+index-dir

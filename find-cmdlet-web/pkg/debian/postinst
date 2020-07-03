@@ -1,0 +1,32 @@
+#!/bin/sh
+# postinst script for #PACKAGE#
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    user=find-cmdlet-web
+    group=$user
+    homedir=/var/lib/$user
+
+    if ! getent group $group > /dev/null; then
+        addgroup --system --quiet $group
+    fi
+
+    if ! getent passwd $user > /dev/null; then
+        adduser \
+            --system \
+            --quiet \
+            --home $homedir \
+            --no-create-home \
+            --ingroup $group \
+            $user
+    fi
+
+    mkdir -p $homedir
+    chown $user:$group $homedir
+
+fi
+
+#DEBHELPER#
+
+exit 0

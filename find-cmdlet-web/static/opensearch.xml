@@ -1,0 +1,11 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Find-Cmdlet</ShortName>
+  <LongName>Search Find-Cmdlet</LongName>
+  <Description>A search engine for PowerShell cmdlets</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="64" height="64" type="image/png">https://find-cmdlet.com/static/favicon64.png</Image>
+  <Image width="16" height="16" type="image/x-icon">https://find-cmdlet.com/static/favicon.ico</Image>
+  <Url type="text/html" template="https://find-cmdlet.com/search?q={searchTerms}" />
+  <moz:SearchForm>https://find-cmdlet.com/</moz:SearchForm>
+</OpenSearchDescription>
