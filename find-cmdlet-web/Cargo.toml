@@ -1,6 +1,6 @@
 [package]
 name = "find-cmdlet-web"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Robert Clipsham <robert@octarineparrot.com>"]
 edition = "2018"
 

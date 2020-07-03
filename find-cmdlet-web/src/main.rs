@@ -18,7 +18,7 @@ struct SearchQuery {
     #[serde(rename = "q")]
     query: String,
     #[serde(rename = "t")]
-    ty: String,
+    ty: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -226,7 +226,7 @@ async fn search(
 
     let mut response = HttpResponse::Ok();
 
-    if query.ty == "json" {
+    if query.ty == Some("json".to_string()) {
         Ok(response.json(results))
     } else {
         let meta = "<meta name=\"robots\" content=\"noindex\">";
