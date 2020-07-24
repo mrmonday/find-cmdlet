@@ -1,0 +1,20 @@
+ - name: Install sudo
+   apt:
+       name: sudo
+
+ - name: Create ansible user
+   user:
+       name: ansible
+       password: "*"
+
+ - name: Enable nopasswd sudo for ansible user
+   lineinfile:
+       path: /etc/sudoers
+       regexp: '^ansible'
+       line: 'ansible ALL=(ALL:ALL) NOPASSWD: ALL'
+
+ - name: Add authorized keys for ansible user
+   authorized_key:
+       user: ansible
+       key: "{{ lookup('pipe', 'cat pubkeys/*.pub') }}"
+       exclusive: yes

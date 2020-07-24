@@ -1,0 +1,12 @@
+ansible_python_interpreter: /usr/bin/python3
+ansible_user: ansible
+ansible_become: yes
+wireguard_listen_port:
+wireguard_server:
+wireguard_server_ip:
+wireguard_server_public_key:
+zabbix_release_deb: https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
+zabbix_server_ip:
+zabbix_server_host:
+zabbix_login_user:
+zabbix_login_password:

@@ -1,0 +1,21 @@
+ - name: Set hostname
+   hostname:
+       name: "{{ inventory_hostname }}"
+
+ - name: Install vim
+   apt:
+       name: vim
+
+ - name: Set vim as default editor
+   lineinfile:
+       path: /etc/environment
+       regexp: '^EDITOR'
+       line: 'EDITOR=vim'
+
+ - name: Set up global vimrc
+   copy:
+       src: vimrc.local
+       dest: /etc/vim/vimrc.local
+       owner: root
+       group: root
+       mode: '0644'

@@ -1,0 +1,20 @@
+# Enable automatic security updates
+- name: Install unattended-upgrades
+  apt:
+      name:
+          - unattended-upgrades
+          - apt-listchanges
+
+- name: Enable automatic updates
+  copy:
+      src: 20auto-upgrades
+      dest: /etc/apt/apt.conf.d/20auto-upgrades
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Enable automatic reboot
+  replace:
+      path: /etc/apt/apt.conf.d/50unattended-upgrades
+      regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";$'
+      replace: 'Unattended-Upgrade::Automatic-Reboot "true";'

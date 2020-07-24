@@ -1,0 +1,4 @@
+ - name: Install updates
+   apt:
+       update_cache: true
+       upgrade: dist

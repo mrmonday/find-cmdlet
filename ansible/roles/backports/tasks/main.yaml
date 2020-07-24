@@ -1,0 +1,9 @@
+- name: Enable backports repository
+  copy:
+      src: backports.list
+      dest: /etc/apt/sources.list.d/backports.list
+      owner: root
+      group: root
+      mode: '0644'
+  notify:
+      refresh apt

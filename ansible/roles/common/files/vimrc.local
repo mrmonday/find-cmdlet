@@ -1,0 +1,24 @@
+set number
+set relativenumber
+set numberwidth=3
+set ruler
+set showcmd
+set showmatch
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+set background=dark
+set noerrorbells
+set vb t_vb=
+set ttyfast
+set listchars=tab:>-,trail:~
+set list
+set lazyredraw
+set timeoutlen=1000
+set ttimeoutlen=100
+set expandtab
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set backspace=indent,eol,start

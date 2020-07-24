@@ -1,0 +1,13 @@
+- name: Setup web hosts
+  hosts: web
+  roles:
+      - common
+      - { role: sshd, tags: ['sshd'] }
+      - { role: fail2ban, tags: ['fail2ban'] }
+      - { role: apparmor, tags: ['apparmor'] }
+      - { role: ufw, tags: ['ufw'] }
+      - { role: unattended-upgrades, tags: ['unattended-upgrades'] }
+      - { role: backports, tags: ['backports'] }
+      - { role: wireguard, tags: ['wireguard'] }
+      - { role: zabbix-agent, tags: ['zabbix-agent'] }
+      - { role: find-cmdlet-web, tags: ['find-cmdlet-web'] }

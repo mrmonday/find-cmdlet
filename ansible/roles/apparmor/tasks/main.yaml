@@ -1,0 +1,7 @@
+ - name: Install AppArmor profiles
+   apt:
+       name:
+           - apparmor
+           - apparmor-profiles
+           - apparmor-profiles-extra
+

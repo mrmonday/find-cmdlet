@@ -1,0 +1,9 @@
+[Interface]
+PrivateKey = {{ wireguard_private_key.stdout }}
+Address = {{ wireguard_cidr }}
+
+[Peer]
+PublicKey = {{ wireguard_server_public_key }}
+PresharedKey = {{ wireguard_psk.stdout }}
+Endpoint = {{ wireguard_server }}:{{ wireguard_listen_port }}
+AllowedIPs = {{ wireguard_server_ip }}/32

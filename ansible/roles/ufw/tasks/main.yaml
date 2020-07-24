@@ -1,0 +1,34 @@
+- name: Install ufw
+  apt:
+      name: ufw
+
+- name: Allow incoming ssh traffic
+  ufw:
+      rule: allow
+      name: openssh
+  when: "'sshd' in ansible_role_names"
+
+- name: Allow incoming zabbix agent traffic
+  ufw:
+      rule: allow
+      proto: tcp
+      to_port: '10050'
+      from_ip: "{{ zabbix_server_ip }}"
+  when: "'zabbix-agent' in ansible_role_names"
+
+- name: Allow incoming find-cmdlet-web traffic
+  ufw:
+      rule: allow
+      proto: tcp
+      to_port: '443'
+  when: "'find-cmdlet-web' in ansible_role_names"
+
+- name: Deny all incoming traffic by default
+  ufw:
+      default: deny
+      direction: incoming
+
+- name: Enable firewall
+  ufw:
+      state: enabled
+

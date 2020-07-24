@@ -1,0 +1,4 @@
+# Debian enables the ssh jail by default, just need to install it
+- name: Install fail2ban
+  apt:
+      name: fail2ban

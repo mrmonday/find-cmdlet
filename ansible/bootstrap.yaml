@@ -1,0 +1,5 @@
+- name: Bootstrap node
+  hosts: "{{ target }}"
+  roles:
+      - init
+      - ansible

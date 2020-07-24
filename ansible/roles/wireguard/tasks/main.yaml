@@ -1,0 +1,32 @@
+- name: Install wireguard
+  apt:
+      update_cache: yes
+      name:
+          - wireguard
+
+- name: Generate private key
+  command:
+      cmd: wg genkey
+      creates: /etc/wireguard/wg0.conf
+  register: wireguard_private_key
+
+- name: Generate preshared key
+  command:
+      cmd: wg genpsk
+      creates: /etc/wireguard/wg0.conf
+  register: wireguard_psk
+
+- name: Copy wireguard config file
+  template:
+      src: wg0.conf.j2
+      dest: /etc/wireguard/wg0.conf
+      owner: root
+      group: root
+      mode: '0600'
+      force: no
+
+- name: Enable wg-quick service
+  service:
+      name: wg-quick@wg0
+      enabled: yes
+      state: restarted

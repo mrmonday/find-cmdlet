@@ -1,0 +1,75 @@
+- name: Check if zabbix sources.list exists
+  stat:
+      path: /etc/apt/sources.list.d/zabbix.list
+  register: zabbix_sources_stat
+
+- name: Install zabbix sources.list
+  apt:
+      deb: "{{ zabbix_release_deb }}"
+  when:
+      not zabbix_sources_stat.stat.exists
+
+- name: Refresh apt cache
+  apt:
+      update_cache: yes
+
+- name: Install zabbix agent
+  apt:
+      name: zabbix-agent2
+
+- name: Generate zabbix agent psk
+  shell: "cat /etc/zabbix/zabbix_agent2.psk || openssl rand -hex 64"
+  register:
+      zabbix_agent_psk
+
+- name: Create psk file
+  copy:
+      content: "{{ zabbix_agent_psk.stdout }}"
+      dest: /etc/zabbix/zabbix_agent2.psk
+      owner: zabbix
+      group: zabbix
+      mode: '0600'
+      force: false
+
+- name: Create host on zabbix
+  vars:
+      ansible_become: no
+  local_action:
+      module: zabbix_host
+      server_url: "https://{{ zabbix_server_host }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      host_name: "{{ ansible_hostname }}"
+      host_groups:
+          - Linux servers
+      link_templates:
+          - Template OS Linux by Zabbix agent
+          - Template App SSH Service
+          - Template App Find-Cmdlet Web
+      interfaces:
+          - ip: "{{ wireguard_ip }}"
+            type: 1
+            useip: 1
+            main: 1
+      # This is broken for updates as of ansible 2.9.7
+      # It seems to be fixed here: https://github.com/ansible-collections/community.zabbix/blob/c678b83dc5af8abe169f266a4d0b416138b60989/plugins/modules/zabbix_host.py
+      #inventory_mode: automatic
+      tls_accept: 2
+      tls_connect: 2
+      tls_psk_identity: "PSK{{ ansible_hostname }}"
+      tls_psk: "{{ zabbix_agent_psk.stdout }}"
+
+- name: Copy zabbix config
+  template:
+      src: zabbix_agent2.conf.j2
+      dest: /etc/zabbix/zabbix_agent2.conf
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Enable zabbix-agent service
+  service:
+      name: zabbix-agent2
+      enabled: yes
+      state: restarted
+

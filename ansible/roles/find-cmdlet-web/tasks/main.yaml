@@ -1,0 +1,33 @@
+- name: Copy install package
+  copy:
+      src: find-cmdlet-web_0.1.2-1_amd64.deb
+      dest: /tmp/find-cmdlet-web_0.1.2-1_amd64.deb
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Install find-cmdlet-web
+  apt:
+      deb: /tmp/find-cmdlet-web_0.1.2-1_amd64.deb
+
+- name: Enable find-cmdlet-web socket
+  systemd:
+      name: find-cmdlet-web.socket
+      daemon_reload: yes
+      enabled: yes
+
+- name: Stop find-cmdlet-web service
+  systemd:
+      name: find-cmdlet-web.service
+      state: stopped
+
+- name: Restart find-cmdlet-web socket
+  systemd:
+      name: find-cmdlet-web.socket
+      state: restarted
+
+#- name: Enable find-cmdlet-web socket
+#  service:
+#      name: find-cmdlet-web.socket
+#      enabled: yes
+#      state: restarted
